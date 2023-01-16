@@ -1,7 +1,6 @@
-\documentclass[10pt]{article}
-\usepackage{amsmath,microtype,paralist}
-
-\usepackage[round]{natbib}
+\documentclass[a4paper,10pt]{article}
+\usepackage{amsmath,microtype,paralist,mathpazo,fullpage,hyperref}
+\usepackage[authoryear,round]{natbib}
 
 \newcommand{\smfrac}[2]{{\scriptstyle\frac{#1}{#2}}}
 \newcommand{\E}{\text{E}}
@@ -10,137 +9,103 @@
 \def\median{\text{median}}
 \def\gmean{\text{gmean}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\oddsidemargin 16.5mm
-\evensidemargin 16.5mm
-\textwidth 28cc
-\textheight 42cc
-
-\parskip .5mm
-\parindent 2cc
-
-\makeatletter
-\renewcommand{\section}%
-{\@startsection{section}{1}{0mm}{\baselineskip}{0.5\baselineskip}{\normalfont\large\rmfamily\bfseries}}
-\makeatother
-
-
-\makeatletter
-\renewcommand{\subsection}%
-{\@startsection{subsection}{1}{0mm}{\baselineskip}{0.5\baselineskip}{\normalfont\rmfamily\bfseries}}
-\makeatother
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \begin{document}
+\title{Forecasting overview}
+\author{Rob J Hyndman\footnote{Rob J Hyndman FAA FASSA is Professor of Statistics in the Department of Econometrics \& Business Statistics at Monash University, Australia. He has published extensively in leading statistical and forecasting journals. He is co-author of the highly regarded online text on business forecasting, \emph{Forecasting: principles and practice} (OTexts, 3rd edition, 2021, \url{OTexts.com/fpp3}). Professor Hyndman was Editor-in-Chief of the \emph{International Journal of Forecasting} from 2005 to 2018. He is an elected Fellow of the Australian Academy of Science, the Academy of the Social Sciences in Australia, and the International Institute of Forecasters. In 2007, he was awarded the prestigious Moran Medal from the Australian Academy of Science, for his contributions to statistical research. In 2021, he won the Pitman Medal from the Statistical Society of Australia.}}
+\date{}
+\maketitle
 
+\section{What can be forecast?}
 
-\begin{center}
+Forecasting is required in many situations: deciding whether to build another power generation plant in the next five years requires forecasts of future demand; scheduling staff in a call centre next week requires forecasts of call volume; stocking an inventory requires forecasts of stock requirements. Forecasts can be required several years in advance (for the case of capital investments), or only a few minutes beforehand (for telecommunication routing). Whatever the circumstances or time horizons involved, forecasting is an important aid in effective and efficient planning.
 
-{\large \bf FORECASTING OVERVIEW}\\[2mm]
-
-{\large \it Rob J Hyndman \footnote{Rob Hyndman is Professor of Statistics and Director of the Business and Economic Forecasting Unit at Monash University, Australia. He has published extensively in leading statistical and forecasting journals. He is co-author of the highly regarded international text on business forecasting, \emph{Forecasting: methods and applications} (Wiley, 3rd edition 1998), and more recently \emph{Forecasting with exponential smoothing: a state space approach} (Springer, 2008).  Professor Hyndman is Editor-in-Chief of the \emph{International Journal of Forecasting} and was previously Theory and Methods Editor of the \emph{Australian and New Zealand Journal of Statistics} (2001–--2004). He was elected to the International Statistical Institute in 2005. In 2007 he was awarded the prestigious Moran Medal from the Australian Academy of Science, for for his contributions to statistical research.
- }}\\[2mm]
-
-
-Professor of Statistics, Department of Econometrics \& Business Statistics
-
-Director, Business and Economic Forecasting Unit
-
-Monash University, Australia\\
-
-\end{center}
-
-\section*{1. What can be forecast?}
-
-Forecasting is required in many situations: deciding whether to build another power generation plant in the next five years requires forecasts of future demand; scheduling staff in a call centre next week requires forecasts of call volume; stocking an inventory requires forecasts of stock requirements. Forecasts can be required several years in advance (for the case of capital investments), or only a few minutes beforehand  (for telecommunication routing). Whatever the circumstances or time horizons involved, forecasting is an important aid in effective and efficient planning.
-
-Some things are easier to forecast than others. The time of the sunrise tomorrow morning can be forecast very precisely. On the other hand, currency exchange rates are very difficult to forecast with any accuracy. The predictability of an event or a quantity depends on how well we understand the factors that contribute to it, and how much unexplained variability is involved.
-
-Forecasting situations vary widely in their time horizons, factors determining actual outcomes, types of data patterns, and many  other aspects. Forecasting methods can be very simple such as using the most recent observation as a forecast (which is called the ``na\"{\i}ve method''), or  highly complex such as neural nets and econometric systems of simultaneous equations. The choice of method depends on what data is available and the predictability of the quantity to be forecast.
-
-\section*{2. Forecasting methods}
-
-Forecasting methods fall into two major categories: quantitative and qualitative methods.
-\begin{description}
-\item[Quantitative forecasting] can be applied when two conditions are satisfied:
+Some things are easier to forecast than others. The time of the sunrise tomorrow morning can be forecast very precisely. On the other hand, currency exchange rates are very difficult to forecast with any accuracy. The predictability of an event or a quantity depends on several factors \citep{fpp3}:
 \begin{compactenum}
-\item  numerical information about the past is available;
-
-\item  it is reasonable to assume that some aspects of the past patterns will continue into the future.
+  \item how well we understand the factors that contribute to it;
+  \item how much data is available;
+  \item how similar the future is to the past;
+  \item whether the forecasts can affect the thing we are trying to forecast.
 \end{compactenum}
-There is a wide range of quantitative forecasting methods, often developed within specific disciplines for specific purposes. Each method has its own properties, accuracies, and costs that must be considered when choosing a specific method.
 
-\item[Qualitative forecasting] methods are used when one or both of the above conditions does not hold. They are also used to adjust quantitative forecasts, taking account of information that was not able to be incorporated into the formal statistical model. These are not purely guesswork---there are well-developed structured approaches to obtaining good judgemental forecasts.
+Forecasting situations vary widely in their time horizons, factors determining actual outcomes, types of data patterns, and many other aspects. Forecasting methods can be very simple such as using the most recent observation as a forecast (which is called the ``na\"{\i}ve method''), or highly complex such as neural networks and econometric systems of simultaneous equations. The choice of method depends on what data is available and the predictability of the quantity to be forecast.
 
-    As qualitative methods are non-statistical, they will not be considered further in this article.
+\section{Forecasting methods}
+
+Forecasting methods fall into two major categories: statistical (including machine learning) and judgemental methods.
+\begin{description}
+  \item[Statistical forecasting] can be applied when two conditions are satisfied:
+    \begin{compactenum}
+      \item numerical information about the past is available;
+      \item it is reasonable to assume that some aspects of the past patterns will continue into the future.
+    \end{compactenum}
+    There is a wide range of statistical forecasting methods, often developed within specific disciplines for specific purposes. Each method has its own properties, accuracies, and costs that must be considered when choosing a specific method.
+
+  \item[Judgemental forecasting] methods are used when one or both of the above conditions does not hold. They are also used to adjust statistical forecasts, taking account of information that was not able to be incorporated into the formal statistical model. These are not purely guesswork---there are well-developed structured approaches to obtaining good judgemental forecasts.
+
+    As judgemental methods are non-statistical, they will not be considered further in this article.
 \end{description}
-
 
 \subsection*{Explanatory versus time series forecasting}
 
-Quantitative forecasts can be largely divided into two classes:  time series and explanatory models. Explanatory models assume that the variable to be forecasted exhibits an explanatory relationship with one or more other variables. For example, we may model the electricity demand (ED) of a hot region during the summer period as
+Statistical forecasts can be largely divided into two classes: time series and explanatory models. Explanatory models assume that the variable to be forecasted exhibits an explanatory relationship with one or more other ``predictor'' variables. For example, we may model the electricity demand (ED) of a hot region during the summer period as
 \begin{equation}
-\text{ED} = f(\text{current temperature, strength of economy, population, time of day, day of week, error}).
+  \text{ED} = f(\text{current temperature, strength of economy, population, time of day, day of week, error}).
 \end{equation}
 The relationship is not exact---there will always be changes in electricity demand that can not be accounted for by the variables in the model. The ``error'' term on the right allows for random variation and the effects of relevant variables not included in the model. Models in this class include regression models, additive models, and some kinds of neural networks.
 
 The purpose of the explanatory model is to describe the form of the relationship and use it to forecast future values of the forecast variable. Under this model, any change in inputs will affect the output of the system in a predictable way, assuming that the explanatory relationship does not change.
 
-In contrast, time series forecasting uses only information on the variable to be forecast, and makes no attempt to discover the factors affecting its behavior.  For example,
+In contrast, time series forecasting uses only information on the variable to be forecast, and makes no attempt to discover the factors affecting its behaviour. For example,
 \begin{equation}
-\text{ED}_{t+1} = f(\text{ED}_t,
-\text{ED}_{t-1}, \text{ED}_{t-2}, \text{ED}_{t-3},\dots, \text{error}),
+  \text{ED}_{t+1} = f(\text{ED}_t,
+  \text{ED}_{t-1}, \text{ED}_{t-2}, \text{ED}_{t-3},\dots, \text{error}),
 \end{equation}
-where $t$ is the present hour, $t + 1$ is the next hour, $t - 1$ is the previous hour, $t - 2$ is two hours ago, and so on. Here, prediction of the future is based on past values of a variable and/or past errors, but not on explanatory variables which may affect the system. Time series models used for forecasting include ARIMA models, exponential smoothing and structural models.
+where $t$ is the present hour, $t + 1$ is the next hour, $t - 1$ is the previous hour, $t - 2$ is two hours ago, and so on. Here, prediction of the future is based on past values of a variable and/or past errors, but not on predictor variables that may affect the system. Time series models used for forecasting include ARIMA models, exponential smoothing and structural models.
 
+There are several reasons for using a time series forecast rather than an explanatory model for forecasting. First, it may be difficult to measure the relevant predictor variables in order to obtain the necessary data. Second, even if the data is available, it is necessary to forecast the various predictor variables in order to be able to forecast the variable of interest, and this may be too difficult. Third, even if the predictor variables can be measured and forecasted, their forecasts will introduce additional uncertainty into the process, and the resulting forecasts of the variable of interest may be worse than simply using a time series model.
 
-There are several reasons for using a time series forecast rather than an explanatory model for forecasting. First, the system may not be understood, and even if it was understood it may be extremely difficult to measure the relationships assumed to govern its behavior. Second, it is necessary to predict the various explanatory variables in order to be able to forecast the variable of interest, and this may be too difficult. Third, the main concern may be only to predict what will happen and not to know why it happens.
-
-A third type of forecasting model uses both time series and explanatory variables. For example,
+A third type of forecasting model uses both time series and predictor variables. For example,
 \begin{equation}
-\text{ED}_{t+1} = f(\text{ED$_t$, current temperature, time of day, day of week, error}).
+  \text{ED}_{t+1} = f(\text{ED$_t$, current temperature, time of day, day of week, error}).
 \end{equation}
-These types of models have been given various names in different disciplines. They are known as dynamic regression models, panel data models, longitudinal models, transfer function models, and linear system models (assuming $f$ is linear).
+These types of models have been given various names in different disciplines. They are known as dynamic regression models, ARMAX models, transfer function models, and linear system models (assuming $f$ is linear).
 
-
-\section*{3. The basic steps in a forecasting task}
+\section{The basic steps in a forecasting task}
 
 There are usually five basic steps in any forecasting task.
 \begin{description}
-\item[Step 1: Problem definition]
-    Often this is most difficult part of forecasting. Defining the problem carefully requires an understanding of how the forecasts will be used, who requires the forecasts, and how the forecasting function fits within the organization requiring the forecasts. A forecaster needs to spend time talking to everyone who will be involved in collecting data, maintaining databases, and using the forecasts for future planning.
+  \item[Step 1: Problem definition]
+    Often this is the most difficult part of forecasting. Defining the problem carefully requires an understanding of how the forecasts will be used, who requires the forecasts, and how the forecasting function fits within the organisation requiring the forecasts. A forecaster needs to spend time talking to everyone who will be involved in collecting data, maintaining databases, and using the forecasts for future planning.
 
-\item[Step 2: Gathering information]
-    There are always at least two kinds of information required: (a) statistical data, and (b) the accumulated expertise of the people who collect the data and use the forecasts.  Often, a difficulty will be obtaining enough historical data to be able to fit a good statistical model. However, occasionally, very old data will not be so useful due to changes in the system being forecast.
+  \item[Step 2: Gathering information]
+    There are always at least two kinds of information required: (a) statistical data, and (b) the accumulated expertise of the people who collect the data and use the forecasts. Often, a difficulty will be obtaining enough historical data to be able to fit a good statistical model. However, occasionally, very old data will not be so useful due to changes in the system being forecast.
 
-\item[Step 3: Preliminary (exploratory) analysis]
+  \item[Step 3: Preliminary (exploratory) analysis]
     Always start by graphing the data. Are there consistent patterns? Is there a significant trend? Is seasonality important? Is there evidence of the presence of business cycles? Are there any outliers in the data that need to be explained by those with expert knowledge? How strong are the relationships among the variables available for analysis?
 
-\item[Step 4: Choosing and fitting models]
+  \item[Step 4: Choosing and fitting models]
     Which model to use depends on the availability of historical data, the strength of relationships between the forecast variable and any explanatory variables, and the way the forecasts are to be used. It is common to compare two or three potential models.
 
-\item[Step 5: Using and evaluating a forecasting model]
+  \item[Step 5: Using and evaluating a forecasting model]
     Once a model has been selected and its parameters estimated, the model is to be used to make forecasts. The performance of the model can only be properly evaluated after the data for the forecast period have become available. A number of methods have been developed to help in assessing the accuracy of forecasts as discussed in the next section.
 
 \end{description}
 
-
-\section*{4. Forecast distributions}
+\section{Forecast distributions}
 
 All forecasting is about estimating some aspects of the conditional distribution of a random variable. For example, if we are interested in monthly sales denoted by $y_t$ for month $t$, then forecasting concerns the distribution of $y_{t+h}$ conditional on the values of $y_1,\dots,y_t$ along with any other information available. Let $\mathcal{I}_t$ denote all other information available at time $t$. Then we call the distribution of $(y_{t+h} \mid y_1,\dots,y_t,\mathcal{I}_t)$ the \textit{forecast distribution}.
 
-Typically, a forecast consists of a single number (known as a ``point forecast''). This can be considered an estimate of the mean or median of the forecast distribution. It is often useful to provide information about forecast uncertainty as well in the form of a prediction interval. For example, if the forecast distribution is normal with mean $\hat{y}_{t+h}$ and variance $\sigma^2_{t+h}$, then a 95\% prediction interval for $y_{t+h}$ is $\hat{y}_{t+h}\pm 1.96\sigma_{t+h}^2$. Prediction intervals in forecasting are sometimes called ``interval forecasts''
+Typically, a forecast is presented as a single number (known as a ``point forecast''). This can be considered an estimate of the mean or median of the forecast distribution. It is often useful to provide information about forecast uncertainty as well in the form of a prediction interval. For example, if the forecast distribution is normal with mean $\hat{y}_{t+h}$ and variance $\sigma^2_{t+h}$, then a 95\% prediction interval for $y_{t+h}$ is $\hat{y}_{t+h}\pm 1.96\sigma_{t+h}^2$. Prediction intervals in forecasting are sometimes called ``interval forecasts''
 
-For some problems, it is also useful to estimate the forecast distribution rather than assume normality or some other parametric form. This is called ``density forecasting''.
+For some problems, it is also useful to estimate the forecast distribution rather than assume normality or some other parametric form. This is called ``density forecasting'' or ``probabilistic forecasting''. When only certain quantiles of the forecast distribution are computed, it is often called ``quantile forecasting''.
 
+\section{Evaluating forecast accuracy}
 
-\section*{5. Evaluating forecast accuracy}
+It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when developing the model. When choosing models, it is common to split the data into a training set, $\{y_1,\dots,y_t\}$, and a test set $\{y_{t+1}, \dots, y_{T}\}$, where $T$ is the time of the last observation. Only the training set can be used for fitting or training the model. Then the test data can be used to measure how well the model is likely to forecast on new data.
 
-It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model. When choosing models, it is common to use a portion of the available data for testing, and use the rest of the data for fitting the model. Then the testing data can be used to measure how well the model is likely to forecast on new data.
+A more sophisticated variation of a training/test split is time series cross-validation, where the training/test set split above is repeated for $t = T_1,T_1+1,\dots,T-1$; here $T_1$ is the minimal sample sized need to train a model. This is sometimes called ``forecasting with a rolling origin''.
 
-The issue of measuring the accuracy of forecasts from different methods has been the subject of much attention. We summarize some of the approaches here. A more thorough discussion is given by \citeauthor{HK06} (\citeyear{HK06}).
-In the following discussion, $\hat{y}_t$ denotes a forecast of $y_t$. We only consider the evaluation of point forecasts. There are also methods available for evaluating interval forecasts and density forecasts (\citeauthor{CS05}, \citeyear{CS05}).
+The issue of measuring the accuracy of forecasts from different methods has been the subject of much attention. We summarize some of the approaches here. A more thorough discussion is given by \citet{HK06}. In the following discussion, $\hat{y}_t$ denotes a forecast of $y_t$. We only consider the evaluation of point forecasts. There are also methods available for evaluating interval forecasts and density forecasts \citep{fpp3}.
 
 \subsection*{Scale-dependent errors}
 
@@ -148,63 +113,36 @@ The forecast error is simply $e_t=y_t-\hat{y}_{t}$ which is on the same scale as
 
 The two most commonly used scale-dependent measures are based on the absolute error or squared errors:
 \begin{align*}
-\text{Mean absolute error (MAE)} &= \mean(|e_{t}|),\\
-\text{Mean squared error (MSE)} &= \mean(e_{t}^2).
+  \text{Mean absolute error (MAE)} & = \mean(|e_{t}|),  \\
+  \text{Mean squared error (MSE)}  & = \mean(e_{t}^2).
 \end{align*}
-When comparing forecast methods on a single series, the MAE is popular as it is easy to understand and compute.
+When comparing forecast methods on a single series, the MAE is popular as it is easy to understand and compute. It is optimised when the point forecast is the median of the forecast distribution. The MSE is optimised when the point forecast is the mean of the forecast distribution.
 
 \subsection*{Percentage errors}
 
 The percentage error is given by $p_t = 100 e_t/y_t$. Percentage errors have the advantage of being scale-independent, and so are frequently used to compare forecast performance between different
 data sets. The most commonly used measure is:
 \[
-\text{Mean absolute percentage error (MAPE)} = \mean(|p_{t}|)
+  \text{Mean absolute percentage error (MAPE)} = \mean(|p_{t}|)
 \]
-Measures based on percentage errors have the disadvantage of being infinite or undefined if $y_t=0$ for any $t$ in the period of interest, and having an extremely skewed distribution when any $y_t$ is close to zero. Another problem with percentage errors that is often overlooked is that they assume a meaningful zero. For example, a percentage error makes no sense when measuring the accuracy of temperature forecasts on the Fahrenheit or Celsius scales.
-
-They also have the disadvantage that they put a heavier penalty on positive errors than on negative errors. This observation led to the use of the so-called ``symmetric'' MAPE proposed by Armstrong (1985, p. 348), which was used in the M3 forecasting competition (\citeauthor{M3comp00}, \citeyear{M3comp00})). It is defined by
-\[
-\text{Symmetric mean absolute percentage error (sMAPE)} =\mean\left(200\left.|y_t - \hat{y}_{t}|\middle/(y_t+\hat{y}_{t})\right.\right).
-\]
-However, if $y_t$ is zero, $\hat{y}_{t}$ is also likely to be close to zero. Thus, the measure still involves division by a number close to zero. Also, the value of sMAPE can be negative, so it is not
-really a measure of ``absolute percentage errors'' at all. \citeauthor{HK06} (\citeyear{HK06}) recommend that the sMAPE not be used.
-
+Measures based on percentage errors have the disadvantage of being infinite or undefined if $y_t=0$ for any $t$ in the period of interest, and having an extremely skewed distribution when any $y_t$ is close to zero. Another problem with percentage errors which is often overlooked is that they assume the data are on a ratio scale, so that percentages are unchanged if the units of measurement are changed. For example, a percentage error makes no sense when measuring the accuracy of temperature forecasts on the Fahrenheit or Celsius scales. They also have the disadvantage that they put a heavier penalty on negative errors than on positive errors.
 
 \subsection*{Scaled errors}
 
-The MASE was proposed by \citeauthor{HK06} (\citeyear{HK06}) as an alternative to the MAPE or sMAPE when comparing forecast accuracy across series on different scales. They proposed scaling the errors based on the \emph{in-sample} MAE from the na\"{\i}ve  forecast method. Thus, a scaled error is defined as
+The MASE was proposed by \citet{HK06} as an alternative to the MAPE wwhen comparing forecast accuracy across series on different scales. They proposed scaling the errors based on the \emph{training set} MAE from a na\"{\i}ve forecast method. A scaled error can be defined as
 \[
-q_t = \frac{e_t}{\displaystyle\frac{1}{n-1}\sum_{i=2}^n |y_i-y_{i-1}|},
+  q_t = \frac{e_t}{\displaystyle\frac{1}{T-m}\sum_{i=m+1}^T |y_i-y_{i-m}|},
 \]
-which is independent of the scale of the data. A scaled error is less than one if it arises from  a better forecast than the average one-step na\"{\i}ve forecast computed in-sample. Conversely, it is greater than one if the forecast is worse than the average one-step na\"{\i}ve forecast computed in-sample.
-The \emph{mean absolute scaled error} is simply
-\[
-\text{MASE} = \mean(|q_t|).
-\]
+where $m$ is the length of the seasonal period of the data (e.g., $m=12$ for monthly data, and $m=1$ for non-seasonal data). Because the numerator and denominator both involve values on the scale of the original data, $q_t$ is independent of the scale of the data. A scaled error is less than one if it arises from a better forecast than the average one-step na\"{\i}ve forecast computed on the training set. Conversely, it is greater than one if the forecast is worse than the average one-step na\"{\i}ve forecast computed on the training set.
 
-\begin{thebibliography}{9}
+The \emph{mean absolute scaled error} is simply $\text{MASE} = \mean(|q_t|)$. Similarly, the \emph{mean squared scaled error} is given by $\text{MSSE} = \mean(q_t^2)$ where
+$$
+  q_t^2 = \frac{e_t^2}{\displaystyle\frac{1}{T-m}\sum_{i=m+1}^T (y_i-y_{i-m})^2},
+$$
+The latter has the advantage of being both scale-free, and optimal for the mean of the forecast distribution. The recent M5 forecasting competition used the MSSE \citep{M5accuracy} to measure point forecast accuracy.
 
- \bibitem{Armstrong85}
-Armstrong, J.~S.  (1985). {\em Long-range
-  forecasting: from crystal ball to computer}, Wiley.
+\nocite{fpp3}
+\bibliography{refs}
+\bibliographystyle{agsm}
 
-\bibitem[Corradi and Swanson(2006)]{CS05}
-Corradi, V. and Swanson, N.~R.  (2006). Predictive density evaluation, In: {\em Handbook of Economic Forecasting},
-  North-Holland, Amsterdam, The Netherlands.
-
-\bibitem[Hyndman and Koehler(2006)]{HK06}
-Hyndman, R.~J. and Koehler, A.~B.  (2006). Another look at measures of forecast accuracy, {\em
-  International Journal of Forecasting} {\bf 22}, (4), 679--688.
-
-\bibitem[Makridakis and Hibon(2000)]{M3comp00}
-Makridakis, S. and Hibon, M.  (2000).
-  The {M3}-competition: Results, conclusions and implications, {\em
-  International Journal of Forecasting} {\bf 16}, 451--476.
-
-\bibitem[Makridakis et~al.(1998)]{MWH3}
-Makridakis, S., Wheelwright, S.~C. and Hyndman, R.~J.
-  (1998). {\em Forecasting: methods and
-  applications}, 3rd edition, John Wiley \& Sons, New York.
-
-\end{thebibliography}
 \end{document}
