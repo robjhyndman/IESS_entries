@@ -21,98 +21,115 @@ Forecasting is a common statistical task in business where it helps inform decis
 	\item[Planning] is a response to forecasts and goals. Planning involves determining the appropriate actions that are required to make your forecasts match your goals.
 \end{description}
 
-Forecasting should be an integral part of the decision-making activities of management, as it can play an important role in many areas of a company. Modern organizations require short-, medium-, and long-term forecasts, depending on the specific application.
+Forecasting should be an integral part of the decision-making activities of management, as it can play an important role in many areas of a company. Modern organisations require short-, medium-, and long-term forecasts, depending on the specific application.
 \begin{description}
 	\item[Short-term forecasts] are needed for scheduling of personnel, production and transportation. As part of the scheduling process, forecasts of demand are often also required.
 	\item[Medium-term forecasts] are needed to determine future resource requirements in order to purchase raw materials, hire personnel, or buy machinery and equipment.
 	\item[Long-term forecasts] are used in strategic planning. Such decisions must take account of market opportunities, environmental factors and internal resources.
 \end{description}
-An organization needs to develop a forecasting system involving several approaches to predicting uncertain events. Such forecasting systems require the development of expertise in identifying forecasting problems, applying a range of forecasting methods, selecting appropriate methods for each problem, and evaluating and refining forecasting methods over time. It is also important to have strong organizational support for the use of formal forecasting methods if they are to be used successfully.
+An organisation needs to develop a forecasting system involving several approaches to predicting uncertain events. Such forecasting systems require the development of expertise in identifying forecasting problems, applying a range of forecasting methods, selecting appropriate methods for each problem, and evaluating and refining forecasting methods over time. It is also important to have strong organisational support for the use of formal forecasting methods if they are to be used successfully.
 
-
-\section{Commonly used methods}
-
-Throughout the 20th century, businesses tended to use relatively simple forecasting methods that are often not based on statistical modelling. However, the use of statistical forecasting has been growing over the last 20 years, and more recently, some machine learning methods have become popular.
-
-* Naive
-* SES, Holt, HW
-* ETS
-* ARIMA
-* Linear regression
-* Nonparametric additive models
-* Dynamic regression
-* Distributed lag models
-* DeepAR and other NN-based methods
-* XGboost?
-
-
-\subsection*{Time series methods}
+Throughout the 20th century, businesses tended to use relatively simple forecasting methods that were often not based on statistical modelling. However, the use of statistical forecasting has been growing over the last 20 years, and more recently, some machine learning methods have become popular.
 
 Let the historical time series data be denoted by $y_1,\dots,y_T$, and the forecast of $y_{T+h}$ be given by $\hat{y}_{T+h|T}$, $h>0$.
 
+\section{Na\"{\i}ve methods}
+
+Na\"{\i}ve forecasting methods are very simple, but often provide better forecasts than more sophisticated methods.
+
+\textbf{Na\"{\i}ve forecasting} is where the forecast of all future values of a time series are set to be equal to the last observed value: $\hat{y}_{T+h|T}=y_T$, $h=1,2,\dots$. If the data follow a random walk process ($y_t=y_{t-1}+e_t$ where $e_t$ is white noise --- a series of iid random variables with zero mean), then this is the optimal method of forecasting. Consequently, it is popular for stock price and stock index forecasting, and for other time series that measure the behaviour of a market that can be assumed to be efficient.
+
+\textbf{Seasonal na\"{\i}ve forecasting} is a variation of na\"{\i}ve forecasting where the forecast is set to be equal to the last observed value from the same season (e.g., with monthly data, each December is forecast using the last observed December value): $\hat{y}_{T+h|T}=y_{T+h-m(k+1)}$, where $m=$ the seasonal period and $k$ is the integer part of $(h-1)/m$, the number of complete years in the forecast period prior to time $T+h$. This is optimal if the data follow a seasonal random walk process, $y_t=y_{t-m}+e_t$ where $e_t$ is white noise.
+
+\section{Exponential smoothing methods}
+
+Exponential smoothing was proposed in the late 1950s \citep{Brown59,Holt57}, and has motivated some of the most successful forecasting methods.
+
+In \textbf{simple exponential smoothing}, forecasts can be computed recursively as each new data point is observed:
+\[
+	\hat{y}_{t+1|t} = \alpha y_t + (1-\alpha)\hat{y}_{t|t-1},
+\]
+where $0<\alpha<1$. (Longer-term forecasts are constant: $\hat{y}_{t+h|t} = \hat{y}_{t+1|t}$, $h\ge2$.)
+Consequently, only the most recent data point and most recent forecast need to be stored. This was an attractive feature of the method when computer storage was expensive. The method has proved remarkably robust to a wide range of time series, and is optimal for several processes including the ARIMA(0,1,1) process \citep{CKOS01}.
+
+\textbf{Holt's linear method} \citep{Holt57} is an extension of simple exponential forecasting that allows a locally linear trend to be extrapolated. Forecasts are given by $\hat{y}_{t+h|t} = \ell_t + hb_t$ where
+\begin{align*}
+	\ell_t & = \alpha y_t + (1-\alpha)(\ell_{t-1} + b_{t-1}), \\
+	b_t    & = \beta(\ell_t-\ell_{t-1}) + (1-\beta)b_{t-1},
+\end{align*}
+and the two parameters $\alpha$ and $\beta$ must lie in $[0,1]$. Here $\ell_t$ denotes the level of the series and $b_t$ the slope of the trend at time $t$.
+
+For seasonal data, a popular method is \textbf{Holt-Winters' method}, also introduced in \citet{Holt57}, which extends Holt's method to include seasonal terms. Then $\hat{y}_{t+h|t} = \ell_t + hb_t + s_{t+h-m(k+1)}$, where
+\begin{align*}
+	\ell_t & = \alpha (y_t -s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1}), \\
+	b_t    & = \beta(\ell_t-\ell_{t-1}) + (1-\beta)b_{t-1},              \\
+	s_t    & = \gamma(y_t-\ell_t)+(1-\gamma)s_{t-m},
+\end{align*}
+$k$ is the integer part of $(h-1)/m$, and the three parameters $\alpha$, $\beta$ and $\gamma$ all lie in [0,1].
+
+There is also a multiplicative version of the Holt-Winters' method, and damped trend versions of both Holt's linear method and Holt-Winters' method \citep{fpp3}. None of these methods are explicitly based on underlying time series models, and as a result the estimation of parameters and the computation of prediction intervals is often not done, or is handled via heuristics.
+
+However, all the above methods have been shown to be optimal for the \textbf{ETS} class of state space models \citep{expsmooth08}, and maximum likelihood estimation of parameters, statistical model selection and computation of prediction intervals is now widespread.
+
+\citet{HKSG02} used this state space framework to develop an automatic forecasting algorithm that could handle any series containing a mix of trend and seasonal components. It quickly became very widely used in business contexts, and variants of the algorithm are now implemented in most forecasting software.
+
+\section{ARIMA models}
+
+Another widely-used model class for forecasting is the class of \textbf{ARIMA} (AutoRegressive Integrated Moving Average) models. Rather than describing a series using unobserved level, slope and seasonal components, these models use lagged values of the observed data and the stochastic noise to model autocorrelations in the data. For example, a model can be of the form
+$$y_t = c + \phi_1y_{t-1} + \dots + \phi_py_{t-p} + \theta_1e_{t-1} + \dots + \theta_qe_{t-q} + e_t$$
+where $p$ determines the number of lagged response variables to include, $q$ determines the number of lagged noise terms to include, and $e_t$ is white noise. There are also variations that handle differenced data, and seasonal terms. These models were popularised by \citet{BJ70}, and so they are sometimes called ``Box-Jenkins'' models.
+
+Historically, the fitting process for such models was manually-intensive and the resulting forecast were often worse than the simpler methods outlined above. But an automatic modelling algorithm proposed by \citet{HK08} proved to be fast and effective for a wide range of time series, and led to these models becoming much more widely used in business contexts. Now most ARIMA modelling is done using the Hyndman-Khandakar algorithm, or a variation of it.
+
+\section{Explanatory variable models for forecasting}
+
+The use of explanatory models in business forecasting is also popular, particularly in data-rich contexts where predictor variables help explain the variation in the variable to be forecast.
+
+For example, \textbf{linear regression} modelling is widely used \citep[e.g.,][]{Pardoe06} where a variable to be forecast is modelled as a linear combination of potential input variables:
+\[
+	y_t = c_0 + \sum_{j=1}^J c_j x_{j,t} + e_t,
+\]
+where $e_t$ denotes a white noise process. Whenever a regression model is used for forecasting, the predictors themselves must also be forecast if they are not known in advance. This limits the value of such models for forecasting. Consequently, it is far more common for regression modelling to be used to explain historical variation than for it to be used for forecasting purposes.
+
+In some domains, the use of \textbf{nonparametric additive} models for forecasting is growing \citep[e.g.,][]{HF10}. Here, the model is often of the form
+\[
+	y_t = \sum_{j=1}^J f_j(x_{j,t}) + e_t,
+\]
+where $f_j$ is a smooth nonlinear function to be estimated nonparametrically.
+
+In advertising, there is a well-developed culture of using \textbf{distributed lag} regression models \citep[e.g.,][]{HPS01} such as
+\[
+	y_t = \sum_{j=1}^J \alpha\lambda^j x_{t-j} + e_t,
+\]
+where $x_t$ denotes advertising expenditure in month $t$, $0<\lambda<1$ and $\alpha>0$.
+
+It is also possible to combine ARIMA models with linear regression models, to form \textbf{dynamic regression} models of the form
+\begin{align*}
+	y_t &= c_0 + \sum_{j=1}^J c_j x_{j,t} + n_t
+\end{align*}
+where $n_t$ is an ARIMA process. See \citet{fpp3} for further details.
+
+\section{Machine learning methods for business forecasting}
+
+Outside of traditional statistical modelling, an enormous amount of forecasting is now done using machine learning methods. Most of these methods have no formal statistical model, prediction intervals are not computed, and there is limited model checking.
+
+Until the last few years, machine learning methods have performed quite poorly in forecasting competitions. For example, in the M3 competition \citep{M3comp}, the neural network submission didn't beat the simple benchmark methods. But in the M4 competition, the two top-performing methods combined machine learning and statistical modelling in a hybrid fashion \citep{M4results}. Then, in the M5 competition \citep{M5accuracy}, almost all of the top methods used LightGBM for performing nonlinear regression with gradient boosted trees \citep{lightgbm}.
+
+A recent review of the methods used in forecasting competitions \citep{Makridakis2022} concluded:
 \begin{itemize}
-	\item Na\"{\i}ve forecasting is where the forecast of all future values of a time series are set to be equal to the last observed value: $\hat{y}_{T+h|T}=y_T$, $h=1,2,\dots$. If the data follow a random walk process ($y_t=y_{t-1}+e_t$ where $e_t$ is white noise --- a series of iid random variables with zero mean), then this is the optimal method of forecasting. Consequently, it is popular for stock price and stock index forecasting, and for other time series that measure the behaviour of a market that can be assumed to be efficient.
-
-	\item Simple exponential smoothing was developed in the 1950s \citep{Brown59} and has been widely used ever since. Forecasts can be computed recursively as each new data point is observed:
-	      \[
-		      \hat{y}_{t+1|t} = \alpha y_t + (1-\alpha)\hat{y}_{t|t-1},
-	      \]
-	      where $0<\alpha<1$. (Longer-term forecasts are constant: $\hat{y}_{t+h|t} = \hat{y}_{t+1|t}$, $h\ge2$.)
-	      Consequently, only the most recent data point and most recent forecast need to be stored. This was an attractive feature of the method when computer storage was expensive. The method has proved remarkably robust to a wide range of time series, and is optimal for several processes including the ARIMA(0,1,1) process \citep{CKOS01}.
-
-	\item Holt's linear method \citep{Holt57} is an extension of simple exponential forecasting that allows a locally linear trend to be extrapolated. Forecasts are given by $\hat{y}_{t+h|t} = \ell_t + hb_t$ where
-	      \begin{align*}
-		      \ell_t & = \alpha y_t + (1-\alpha)(\ell_{t-1} + b_{t-1}), \\
-		      b_t    & = \beta(\ell_t-\ell_{t-1}) + (1-\beta)b_{t-1},
-	      \end{align*}
-	      and the two parameters $\alpha$ and $\beta$ must lie in $[0,1]$. Here $\ell_t$ denotes the level of the series and $b_t$ the slope of the trend at time $t$.
-
-	\item For seasonal data, a popular method is the Holt-Winters' method, also introduced in \citeauthor{Holt57} (\citeyear{Holt57}), which extends Holt's method to include seasonal terms. Then $\hat{y}_{t+h|t} = \ell_t + hb_t + s_{t-m+h_m^+}$, where
-    \begin{align*}
-      \ell_t & = \alpha (y_t -s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1}), \\
-      b_t    & = \beta(\ell_t-\ell_{t-1}) + (1-\beta)b_{t-1},              \\
-      s_t    & = \gamma(y_t-\ell_t)+(1-\gamma)s_{t-m},
-    \end{align*}
-    $h_m^+ = [(h-1)\mod m]+1$, and the three parameters $\alpha$, $\beta$ and $\gamma$ all lie in [0,1].
-\end{itemize}
-There is also a multiplicative version of the Holt-Winters' method, and damped trend versions of both Holt's linear method and Holt-Winters' method \citep{fpp3}. None of these methods are explicitly based on underlying time series models, and as a result the estimation of parameters and the computation of prediction intervals is often not done. However, all the above methods have  been shown to be optimal for some state space models \citep{expsmooth08}, and maximum likelihood estimation of parameters, statistical model selection and computation of prediction intervals is now becoming more widespread.
-
-Other time series models sometimes used in business forecasting include ARIMA models, GARCH models (especially in finance), structural models and neural networks.
-
-\subsection*{Explanatory models for forecasting}
-
-The use of explanatory models in business forecasting does not have such a long history as the use of time series methods.
-\begin{itemize}
-	\item Linear regression modelling is now widely used \citep[e.g.,][]{Pardoe06}
-	      where a variable to be forecast is modelled as  linear combination of potential input variables:
-	      \[
-		      y_t = \sum_{j=1}^J c_j x_{j,t} + e_t,
-	      \]
-	      where $e_t$ denotes an iid error term with zero mean. An interesting application of regression model to forecasting is given by \citet{BA95} who use a simple regression model to predict the quality of a Grange wine using simple weather variables. However, it is far more common for regression modelling to be used to explain historical variation than for it to be used for forecasting purposes.
-
-	\item
-	      In some domains, the use of nonparametric additive models for forecasting is growing \citep[e.g.,][]{HF10}. Here, the model is often of the form
-	      \[
-		      y_t = \sum_{j=1}^J f_j(x_{j,t}) + e_t,
-	      \]
-	      where $f_j$ is a smooth nonlinear function to be estimated nonparametrically.
-	\item In advertising, there is a well-developed culture of using distributed lag regression models \citep[e.g.,][]{HPS01} such as
-	      \[
-		      y_t = \sum_{j=1}^J \alpha\lambda^j x_{t-j} + e_t,
-	      \]
-	      where $x_t$ denotes advertising expenditure in month $t$, $0<\lambda<1$ and $\alpha>0$.
+	\item Combining forecasting methods improves forecast accuracy \citep[see also][]{combinations};
+	\item Deep learning methods outperform statistical and other machine learning methods by about 6\%;
+	\item Statistical models perform better at shorter forecast horizons, while deep learning performs better at longer horizons;
 \end{itemize}
 
-\subsection*{Data mining methods for business forecasting}
 
-Outside of traditional statistical modelling, an enormous amount of forecasting is done using data mining methods. Most of these methods have no formal statistical model, prediction intervals are not computed, and there is limited model checking. But some of the data-mining methods have proven powerful predictors in some contexts, especially when there is a vast quantity of available data. Predictive methods include neural networks, support vector machines and regression trees. Many of the most best-known business predictive algorithms are based on data-mining methods including the prediction of Netflix ratings (\textit{see} \textbf{Data Mining Time Series Data}, \textbf{Forecasting Principles}
-).
+
 
 % \begin{thebibliography}{xx}
 
 % \bibitem[Pardoe(2006)]{Pardoe06}
-% Pardoe, I.  (2006). {\em Applied regression
-%   modeling: a business approach}, Wiley, Hoboken, NJ.
+% Pardoe, I. (2006). {\em Applied regression
+% modeling: a business approach}, Wiley, Hoboken, NJ.
 
 % \end{thebibliography}
 
