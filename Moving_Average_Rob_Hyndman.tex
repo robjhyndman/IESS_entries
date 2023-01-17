@@ -49,13 +49,14 @@ Each average in \eqref{eq:ma} consists of $2k+1$ observations. Sometimes this is
 
 The simple moving average described above requires an odd number of observations to be included in each average. This ensures that the average is centered at the middle of the data values being averaged. But suppose we wish to calculate a moving average with an even number of observations. For example, to calculate a 4-term moving average, the trend at time $t$ could be calculated as
 \begin{align*}
-	\hat{f}(t-0.5) & = (y_{t-2} + y_{t-1} + y_t + y_{t+1})/4 \\
-	\text{or}\qquad\hat{f}(t+0.5) & = (y_{t-1} + y_{t} + y_{t+1} + y_{t+2})/4
+	\hat{f}(t-0.5) & = (y_{t-2} + y_{t-1} + y_t + y_{t+1})/4   \\
+	\text{or}\qquad
+	\hat{f}(t+0.5) & = (y_{t-1} + y_{t} + y_{t+1} + y_{t+2})/4
 \end{align*}
 That is, we could include two terms on the left and one on the right of the observation, or one term on the left and two terms on the right, and neither of these is centered on $t$. If we now take the average of these two moving averages, we obtain something centered at time $t$.
 \begin{align*}
 	\hat{f}(t) & = \smfrac12\left[ (y_{t-2} + y_{t-1} + y_t + y_{t+1})/4\right] + \smfrac12\left[(y_{t-1} + y_{t} + y_{t+1} + y_{t+2})/4\right] \\
-	 & = \smfrac18 y_{t-2} + \smfrac14 y_{t-1} + \smfrac14 y_t + \smfrac14 y_{t+1} \smfrac18 y_{t+2}
+	           & = \smfrac18 y_{t-2} + \smfrac14 y_{t-1} + \smfrac14 y_t + \smfrac14 y_{t+1} \smfrac18 y_{t+2}
 \end{align*}
 So a 4 MA followed by a 2 MA gives a \textit{centered moving average}, sometimes written as $2\times4$ MA. This is also a weighted moving average of order 5, where the weights for each period are unequal. In general, a $2\times m$ MA smoother is equivalent to a weighted MA of order $m+1$ with weights $1/m$ for all observations except for the first and last observations in the average, which have weights $1/(2m)$.
 
@@ -84,23 +85,30 @@ For example, \citet{Spencer04} proposed a $5\times4\times4$ MA followed by a wei
 	{\begin{small}\setlength{\tabcolsep}{0.15cm}
 			\begin{tabular}{rrrrrrrrrrrrr}
 				\hline
-				\bf Name & $a_0$ & $a_1$ & $a_2$ & $a_3$ & $a_4$ & $a_5$ & $a_6$ & $a_7$ &
-				$a_8$ & $a_9$ & $a_{10}$ & $a_{11}$ \\
+				\bf Name       & $a_0$    & $a_1$    & $a_2$   & $a_3$   & $a_4$
+				               & $a_5$    & $a_6$    & $a_7$   & $a_8$   & $a_9$
+				               & $a_{10}$ & $a_{11}$                               \\
 				\hline
-				3 MA & .333 & .333 \\
-				5 MA & .200 & .200 & .200 \\
-				$2\times12$ MA & .083 & .083 & .083 & .083 & .083 & .083 & .042 \\
-				$3\times3$ MA & .333 & .222 & .111 \\
-				$3\times5$ MA & .200 & .200 & .133 & .067 \\
-				S15 MA & .231 & .209 & .144 & .066 & .009 & $-.016$ & $-.019$ & $-.009$ \\
-				S21 MA & .171 & .163 & .134 & .037 & .051 & .017 & $-.006$ & $-.014$ & $-.014$ & $-.009$ & $-.003$ \\
-				H5 MA & .558 & .294 & $-.073$ \\
-				H9 MA & .330 & .267 & .119 & $-.010$ & $-.041$ \\
-				H13 MA & .240 & .214 & .147 & .066 & .000 & $-.028$ & $-.019$ \\
-				H23 MA & .148 & .138 & .122 & .097 & .068 & .039 & .013 & $-.005$ & $-.015$ & $-.016$ & $-.011$ & $-.004$ \\
+				3 MA           & .333     & .333                                   \\
+				5 MA           & .200     & .200     & .200                        \\
+				$2\times12$ MA & .083     & .083     & .083    & .083    & .083
+				               & .083     & .042                                   \\
+				$3\times3$ MA  & .333     & .222     & .111                        \\
+				$3\times5$ MA  & .200     & .200     & .133    & .067              \\
+				S15 MA         & .231     & .209     & .144    & .066    & .009
+				               & $-.016$  & $-.019$  & $-.009$                     \\
+				S21 MA         & .171     & .163     & .134    & .037    & .051
+				               & .017     & $-.006$  & $-.014$ & $-.014$ & $-.009$ \\
+				H5 MA          & .558     & .294     & $-.073$                     \\
+				H9 MA          & .330     & .267     & .119    & $-.010$ & $-.041$ \\
+				H13 MA         & .240     & .214     & .147    & .066    & .000
+				               & $-.028$  & $-.019$                                \\
+				H23 MA         & .148     & .138     & .122    & .097    & .068
+				               & .039     & .013     & $-.005$ & $-.015$ & $-.016$
+				               & $-.011$  & $-.004$                                \\
 				\hline
-				\multicolumn{9}{l}{S = Spencer's weighted moving average} \\
-				\multicolumn{9}{l}{H = Henderson's weighted moving average} \\
+				\multicolumn{9}{l}{S = Spencer's weighted moving average}          \\
+				\multicolumn{9}{l}{H = Henderson's weighted moving average}        \\
 				\hline
 			\end{tabular}\end{small}
 	}\end{table}
@@ -109,7 +117,7 @@ Weighted moving averages are equivalent to kernel regression when the weights ar
 \[
 	Q(j,k) = \left\{\begin{array}{ll}
 		\left\{1 - [j/(k+1)]^2\right\}^2 & \text{for $-k \le j \le k$}; \\
-		0 & \text{otherwise.}
+		0                                & \text{otherwise.}
 	\end{array}\right.
 \]
 Then $a_j$ is set to $Q(j,k)$ and scaled so the weights sum to one. That is,
