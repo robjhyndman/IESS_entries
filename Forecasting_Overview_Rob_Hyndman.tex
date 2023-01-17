@@ -95,13 +95,15 @@ There are usually five basic steps in any forecasting task.
 
 All forecasting is about estimating some aspects of the conditional distribution of a random variable. For example, if we are interested in monthly sales denoted by $y_t$ for month $t$, then forecasting concerns the distribution of $y_{t+h}$ conditional on the values of $y_1,\dots,y_t$ along with any other information available. Let $\mathcal{I}_t$ denote all other information available at time $t$. Then we call the distribution of $(y_{t+h} \mid y_1,\dots,y_t,\mathcal{I}_t)$ the \textit{forecast distribution}.
 
-Typically, a forecast is presented as a single number (known as a ``point forecast''). This can be considered an estimate of the mean or median of the forecast distribution. It is often useful to provide information about forecast uncertainty as well in the form of a prediction interval. For example, if the forecast distribution is normal with mean $\hat{y}_{t+h}$ and variance $\sigma^2_{t+h}$, then a 95\% prediction interval for $y_{t+h}$ is $\hat{y}_{t+h}\pm 1.96\sigma_{t+h}^2$. Prediction intervals in forecasting are sometimes called ``interval forecasts''
+Often, a forecast is presented as a single number (known as a ``point forecast''). This can be considered an estimate of the mean or median of the forecast distribution.
+
+The forecast distribution allows one to provide information about forecast uncertainty in the form of prediction intervals. For example, if the forecast distribution is normal with mean $\hat{y}_{t+h}$ and variance $\sigma^2_{t+h}$, then a 95\% prediction interval for $y_{t+h}$ is $\hat{y}_{t+h}\pm 1.96\sigma_{t+h}^2$. Prediction intervals in forecasting are sometimes called ``interval forecasts''
 
 For some problems, it is also useful to estimate the forecast distribution rather than assume normality or some other parametric form. This is called ``density forecasting'' or ``probabilistic forecasting''. When only certain quantiles of the forecast distribution are computed, it is often called ``quantile forecasting''.
 
 \section{Evaluating forecast accuracy}
 
-It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when developing the model. When choosing models, it is common to split the data into a training set, $\{y_1,\dots,y_t\}$, and a test set $\{y_{t+1}, \dots, y_{T}\}$, where $T$ is the time of the last observation. Only the training set can be used for fitting or training the model. Then the test data can be used to measure how well the model is likely to forecast on new data.
+It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when developing the model. When evaluating forecast accuracy, it is common to split the data into a training set, $\{y_1,\dots,y_t\}$, and a test set $\{y_{t+1}, \dots, y_{T}\}$, where $T$ is the time of the last observation. Only the training set can be used for fitting or training the model, while the test data can be used to measure how well the model is likely to forecast on new data.
 
 A more sophisticated variation of a training/test split is time series cross-validation, where the training/test set split above is repeated for $t = T_1,T_1+1,\dots,T-1$; here $T_1$ is the minimal sample sized need to train a model. This is sometimes called ``forecasting with a rolling origin''.
 
@@ -141,7 +143,6 @@ $$
 $$
 The latter has the advantage of being both scale-free, and optimal for the mean of the forecast distribution. The recent M5 forecasting competition used the MSSE \citep{M5accuracy} to measure point forecast accuracy.
 
-\nocite{fpp3}
 \bibliography{refs}
 \bibliographystyle{agsm}
 

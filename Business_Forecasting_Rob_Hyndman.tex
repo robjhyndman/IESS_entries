@@ -1,5 +1,5 @@
 \documentclass[a4paper,10pt]{article}
-\usepackage{amsmath,microtype,paralist,mathpazo,fullpage}
+\usepackage{amsmath,microtype,paralist,mathpazo,fullpage,hyperref}
 \usepackage[authoryear,round]{natbib}
 
 \newcommand{\smfrac}[2]{{\scriptstyle\frac{#1}{#2}}}
@@ -37,7 +37,7 @@ Let the historical time series data be denoted by $y_1,\dots,y_T$, and the forec
 
 Na\"{\i}ve forecasting methods are very simple, but often provide better forecasts than more sophisticated methods.
 
-\textbf{Na\"{\i}ve forecasting} is where the forecast of all future values of a time series are set to be equal to the last observed value: $\hat{y}_{T+h|T}=y_T$, $h=1,2,\dots$. If the data follow a random walk process ($y_t=y_{t-1}+e_t$ where $e_t$ is white noise --- a series of iid random variables with zero mean), then this is the optimal method of forecasting. Consequently, it is popular for stock price and stock index forecasting, and for other time series that measure the behaviour of a market that can be assumed to be efficient.
+\textbf{Na\"{\i}ve forecasting} is where the forecasts of all future values of a time series are set to be equal to the last observed value: $\hat{y}_{T+h|T}=y_T$, $h=1,2,\dots$. If the data follow a random walk process ($y_t=y_{t-1}+e_t$ where $e_t$ is white noise\footnote{White noise is a series of iid random variables with zero mean}), then this is the optimal method of forecasting. Consequently, it is popular for stock price and stock index forecasting, and for other time series that measure the behaviour of a market that can be assumed to be efficient.
 
 \textbf{Seasonal na\"{\i}ve forecasting} is a variation of na\"{\i}ve forecasting where the forecast is set to be equal to the last observed value from the same season (e.g., with monthly data, each December is forecast using the last observed December value): $\hat{y}_{T+h|T}=y_{T+h-m(k+1)}$, where $m=$ the seasonal period and $k$ is the integer part of $(h-1)/m$, the number of complete years in the forecast period prior to time $T+h$. This is optimal if the data follow a seasonal random walk process, $y_t=y_{t-m}+e_t$ where $e_t$ is white noise.
 
@@ -67,9 +67,9 @@ For seasonal data, a popular method is \textbf{Holt-Winters' method}, also intro
 \end{align*}
 $k$ is the integer part of $(h-1)/m$, and the three parameters $\alpha$, $\beta$ and $\gamma$ all lie in [0,1].
 
-There is also a multiplicative version of the Holt-Winters' method, and damped trend versions of both Holt's linear method and Holt-Winters' method \citep{fpp3}. None of these methods are explicitly based on underlying time series models, and as a result the estimation of parameters and the computation of prediction intervals is often not done, or is handled via heuristics.
+There is also a multiplicative version of the Holt-Winters' method, and damped trend versions of both Holt's linear method and Holt-Winters' method \citep{fpp3}. None of these methods were explicitly based on underlying time series models, and as a result, the estimation of parameters and the computation of prediction intervals was often not done, or was handled via heuristics, for the first 40--50 years after they were developed.
 
-However, all the above methods have been shown to be optimal for the \textbf{ETS} class of state space models \citep{expsmooth08}, and maximum likelihood estimation of parameters, statistical model selection and computation of prediction intervals is now widespread.
+However, all the above methods have since been shown to be optimal for the \textbf{ETS} class of state space models \citep{expsmooth08}, and maximum likelihood estimation of parameters, statistical model selection and computation of prediction intervals is now widespread.
 
 \citet{HKSG02} used this state space framework to develop an automatic forecasting algorithm that could handle any series containing a mix of trend and seasonal components. It quickly became very widely used in business contexts, and variants of the algorithm are now implemented in most forecasting software.
 
@@ -79,23 +79,23 @@ Another widely-used model class for forecasting is the class of \textbf{ARIMA} (
 $$y_t = c + \phi_1y_{t-1} + \dots + \phi_py_{t-p} + \theta_1e_{t-1} + \dots + \theta_qe_{t-q} + e_t$$
 where $p$ determines the number of lagged response variables to include, $q$ determines the number of lagged noise terms to include, and $e_t$ is white noise. There are also variations that handle differenced data, and seasonal terms. These models were popularised by \citet{BJ70}, and so they are sometimes called ``Box-Jenkins'' models.
 
-Historically, the fitting process for such models was manually-intensive and the resulting forecast were often worse than the simpler methods outlined above. But an automatic modelling algorithm proposed by \citet{HK08} proved to be fast and effective for a wide range of time series, and led to these models becoming much more widely used in business contexts. Now most ARIMA modelling is done using the Hyndman-Khandakar algorithm, or a variation of it.
+Historically, the fitting process for such models was manually-intensive and the resulting forecast were often worse than the simpler methods outlined above. But an automatic modelling algorithm proposed by \citet{HK08} proved to be fast and effective for a wide range of time series, and led to these models becoming much more widely used in business contexts. Now most ARIMA modelling is done using the Hyndman-Khandakar algorithm, or a variant of it.
 
 \section{Explanatory variable models for forecasting}
 
 The use of explanatory models in business forecasting is also popular, particularly in data-rich contexts where predictor variables help explain the variation in the variable to be forecast.
 
-For example, \textbf{linear regression} modelling is widely used \citep[e.g.,][]{Pardoe06} where a variable to be forecast is modelled as a linear combination of potential input variables:
+For example, \textbf{linear regression} modelling is widely used \citep[e.g.,][]{Pardoe06} where a variable to be forecast is modelled as a linear combination of potential predictor variables:
 \[
 	y_t = c_0 + \sum_{j=1}^J c_j x_{j,t} + e_t,
 \]
-where $e_t$ denotes a white noise process. Whenever a regression model is used for forecasting, the predictors themselves must also be forecast if they are not known in advance. This limits the value of such models for forecasting. Consequently, it is far more common for regression modelling to be used to explain historical variation than for it to be used for forecasting purposes.
+and $e_t$ denotes a white noise process. Whenever a regression model is used for forecasting, the predictors themselves must also be forecast if they are not known in advance. This limits the value of such models for forecasting. Consequently, it is far more common for regression modelling to be used to explain historical variation than for it to be used for forecasting purposes.
 
 In some domains, the use of \textbf{nonparametric additive} models for forecasting is growing \citep[e.g.,][]{HF10}. Here, the model is often of the form
 \[
 	y_t = \sum_{j=1}^J f_j(x_{j,t}) + e_t,
 \]
-where $f_j$ is a smooth nonlinear function to be estimated nonparametrically.
+where $f_j$ is a smooth nonlinear function to be estimated nonparametrically. The Facebook Prophet model \citet{prophet2018} is of this form.
 
 In advertising, there is a well-developed culture of using \textbf{distributed lag} regression models \citep[e.g.,][]{HPS01} such as
 \[
@@ -118,22 +118,10 @@ Until the last few years, machine learning methods have performed quite poorly i
 A recent review of the methods used in forecasting competitions \citep{Makridakis2022} concluded:
 \begin{itemize}
 	\item Combining forecasting methods improves forecast accuracy \citep[see also][]{combinations};
-	\item Deep learning methods outperform statistical and other machine learning methods by about 6\%;
-	\item Statistical models perform better at shorter forecast horizons, while deep learning performs better at longer horizons;
+	\item With enough data, deep learning methods outperform statistical and other machine learning methods by about 6\%;
+	\item Statistical models perform better at shorter forecast horizons, while deep learning performs better at longer horizons.
 \end{itemize}
 
-
-
-
-% \begin{thebibliography}{xx}
-
-% \bibitem[Pardoe(2006)]{Pardoe06}
-% Pardoe, I. (2006). {\em Applied regression
-% modeling: a business approach}, Wiley, Hoboken, NJ.
-
-% \end{thebibliography}
-
-\nocite{fpp3}
 \bibliography{refs}
 \bibliographystyle{agsm}
 
